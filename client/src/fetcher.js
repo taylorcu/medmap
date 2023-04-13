@@ -56,6 +56,46 @@ const getPublicHealthRankings = async () => {
     return res.json()
 }
 
+const getCountyMapLink = async (stateName) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/quality/getCountyMapLink?stateName=${stateName}`, {
+        method: 'GET',
+        
+    })
+    return res.json()
+}
+
+const getCountiesFromStateName = async (stateName) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/quality/getCountiesFromStateName?stateName=${stateName}`, {
+        method: 'GET',
+        
+    })
+    return res.json()
+}
+
+const getCountyMortalityResults1 = async (stateName) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/quality/getCountyMortalityResults1?stateName=${stateName}`, {
+        method: 'GET',
+        
+    })
+    return res.json()
+}
+
+const getCountyMortalityResults2 = async (stateName) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/quality/getCountyMortalityResults2?stateName=${stateName}`, {
+        method: 'GET',
+        
+    })
+    return res.json()
+}
+
+const getCountyMortalityResults3 = async (stateName) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/quality/getCountyMortalityResults3?stateName=${stateName}`, {
+        method: 'GET',
+        
+    })
+    return res.json()
+}
+
 
 export {
     getNewsRankings,
@@ -65,5 +105,10 @@ export {
     getAccessRankings,
     getQualityRankings,
     getPublicHealthRankings,
+    getCountyMapLink,
+    getCountiesFromStateName,
+    getCountyMortalityResults1,
+    getCountyMortalityResults2,
+    getCountyMortalityResults3
 
 }

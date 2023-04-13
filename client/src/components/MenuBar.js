@@ -23,6 +23,11 @@ class MenuBar extends React.Component {
                 Map
               </NavLink>
             </NavItem>
+            <NavItem>
+              <NavLink active  href="/quality" >
+                Quality
+              </NavLink>
+            </NavItem>
           </Nav>
       </Navbar>
         )

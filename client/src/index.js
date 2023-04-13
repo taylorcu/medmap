@@ -8,6 +8,7 @@ import {
 
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
+import QualityPage from './pages/QualityPage';
 import 'antd/dist/antd.css';
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -26,6 +27,11 @@ ReactDOM.render(
 							path="/map"
 							render={() => (
 								<MapPage />
+							)}/>
+		<Route exact
+							path="/quality"
+							render={() => (
+								<QualityPage />
 							)}/>
       </Switch>
     </Router>
