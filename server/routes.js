@@ -147,6 +147,227 @@ async function get_publichealth_rankings(req, res) {
     });
 }
 
+// fetch county map link from state name 
+async function get_county_map_link(req, res) {
+    const name = req.query.stateName
+
+    // make database query
+    connection.query(`
+        SELECT Link 
+        FROM CountyMaps
+        WHERE State= '${name}'
+    `, function (error, results, fields) {
+
+        if (error) {
+            console.log(error)
+            res.json({ error: error })
+        } else if (results) {
+            console.log(results)
+            res.json({ results: results})
+        }
+    });
+
+}
+
+// fetch counties list from state name 
+async function get_counties_from_state_name(req, res) {
+    const name = req.query.stateName
+
+    // fetch code from US Maps table then fetch counties 
+    connection.query(`
+        SELECT Code
+        FROM USNewsData
+        WHERE Name='${name}'
+    `, function (error, results, fields) {
+        const stateCode = results[0].Code
+        connection.query(`
+        SELECT * 
+        FROM Counties
+        WHERE state= '${stateCode}'
+    `, function (error, results, fields) {
+
+        if (error) {
+            console.log(error)
+            res.json({ error: error })
+        } else if (results) {
+            console.log(results)
+            res.json({ results: results})
+        }
+    });
+    });
+    
+}
+
+// fetch county mortality results from counties 
+async function get_county_mortality_results1(req, res) {
+    const name = req.query.stateName
+
+    // fetch code from US Maps table then fetch counties 
+    connection.query(`
+        SELECT Code
+        FROM USNewsData
+        WHERE Name='${name}'
+    `, function (error, results, fields) {
+            const stateCode = results[0].Code
+            connection.query(`
+            WITH Master AS (
+                SELECT name, MortalityRates.FIPS AS FIPS, Category, MR
+                FROM Counties
+                JOIN  MortalityRates
+                ON Counties.fips = MortalityRates.FIPS
+                WHERE state='${stateCode}'
+            ),
+            NN As (
+                SELECT FIPS, MR AS MRNN
+                FROM Master
+                WHERE Category='Neonatal disorders'
+            ),
+            HIV AS (
+                SELECT FIPS, MR AS MRHIV
+                FROM Master
+                WHERE Category='HIV/AIDS and tuberculosis'
+            ),
+            MUS AS (
+                SELECT FIPS, MR AS MRMUS
+                FROM Master
+                WHERE Category='Musculoskeletal disorders'
+            ),
+            Named AS (
+                SELECT name, NN.FIPS, MRNN
+                FROM Master NATURAL JOIN NN
+            )
+            SELECT DISTINCT name, MRNN, MRHIV, MRMUS
+            FROM Named NATURAL JOIN HIV NATURAL JOIN MUS
+        `, function (error, results, fields) {
+
+            if (error) {
+                console.log(error)
+                res.json({ error: error })
+            } else if (results) {
+                console.log('mortality')
+                console.log(results)
+                res.json({ results: results})
+            }
+        });
+    });
+
+}
+
+// fetch county mortality results from counties 
+async function get_county_mortality_results2(req, res) {
+    const name = req.query.stateName
+
+    // fetch code from US Maps table then fetch counties 
+    connection.query(`
+        SELECT Code
+        FROM USNewsData
+        WHERE Name='${name}'
+    `, function (error, results, fields) {
+            const stateCode = results[0].Code
+            connection.query(`
+            WITH Master AS (
+                SELECT name, MortalityRates.FIPS AS FIPS, Category, MR
+                FROM Counties
+                JOIN  MortalityRates
+                ON Counties.fips = MortalityRates.FIPS
+                WHERE state='${stateCode}'
+            ),
+            DIG AS (
+                SELECT FIPS, MR AS MRDIG
+                FROM Master
+                WHERE Category='Digestive diseases'
+            ),
+            RESP AS (
+                SELECT FIPS, MR AS MRRESP
+                FROM Master
+                WHERE Category='Chronic respiratory diseases'
+            ),
+            DIA AS (
+                SELECT FIPS, MR AS MRDIA
+                FROM Master
+                WHERE Category='Diabetes; urogenital; blood; and endocrine diseases'
+            ),
+            Named AS (
+                SELECT name, DIG.FIPS, MRDIG
+                FROM Master NATURAL JOIN DIG
+            )
+            SELECT DISTINCT name, MRDIG, MRRESP, MRDIA
+            FROM Named NATURAL JOIN RESP NATURAL JOIN DIA
+        `, function (error, results, fields) {
+
+            if (error) {
+                console.log(error)
+                res.json({ error: error })
+            } else if (results) {
+                console.log('mortality')
+                console.log(results)
+                res.json({ results: results})
+            }
+        });
+    });
+
+}
+
+// fetch county mortality results from counties 
+async function get_county_mortality_results3(req, res) {
+    const name = req.query.stateName
+
+    // fetch code from US Maps table then fetch counties 
+    connection.query(`
+        SELECT Code
+        FROM USNewsData
+        WHERE Name='${name}'
+    `, function (error, results, fields) {
+            const stateCode = results[0].Code
+            connection.query(`
+            WITH Master AS (
+                SELECT name, MortalityRates.FIPS AS FIPS, Category, MR
+                FROM Counties
+                JOIN  MortalityRates
+                ON Counties.fips = MortalityRates.FIPS
+                WHERE state='${stateCode}'
+            ),
+            NUER AS (
+                SELECT FIPS, MR AS MRNUER
+                FROM Master
+                WHERE Category='Neurological disorders'
+            ),
+            LIV AS (
+                SELECT FIPS, MR AS MRLIV
+                FROM Master
+                WHERE Category='Cirrhosis and other chronic liver diseases'
+            ),
+            CARD AS (
+                SELECT FIPS, MR AS MRCARD
+                FROM Master
+                WHERE Category='Cardiovascular diseases'
+            ),
+            MAT AS (
+                SELECT FIPS, MR AS MRMAT
+                FROM Master
+                WHERE Category='Maternal disorders'
+            ),
+            Named AS (
+                SELECT name, NUER.FIPS, MRNUER
+                FROM Master NATURAL JOIN NUER
+            )
+            SELECT DISTINCT name, MRNUER, MRLIV, MRCARD, MRMAT
+            FROM Named NATURAL JOIN LIV NATURAL JOIN CARD NATURAL JOIN MAT
+        `, function (error, results, fields) {
+
+            if (error) {
+                console.log(error)
+                res.json({ error: error })
+            } else if (results) {
+                console.log('mortality')
+                console.log(results)
+                res.json({ results: results})
+            }
+        });
+    });
+
+}
+
 module.exports = {
     get_news_rankings,
     get_name_from_code,
@@ -155,4 +376,9 @@ module.exports = {
     get_access_rankings,
     get_quality_rankings,
     get_publichealth_rankings,
+    get_county_map_link,
+    get_counties_from_state_name,
+    get_county_mortality_results1,
+    get_county_mortality_results2,
+    get_county_mortality_results3
 }

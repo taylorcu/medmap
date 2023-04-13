@@ -32,6 +32,17 @@ app.get('/map/getQualityRankings', routes.get_quality_rankings)
 // MAPPING FROM STATE CODE TO PUBLIC HEALTH RANKING
 app.get('/map/getPublicHealthRankings', routes.get_publichealth_rankings)
 
+// COUNTY MAP FROM STATE NAME 
+app.get('/quality/getCountyMapLink', routes.get_county_map_link)
+
+// COUNTIES FROM STATE NAME 
+app.get('/quality/getCountiesFromStateName', routes.get_counties_from_state_name)
+
+// MORTALITY RESULTS FROM COUNTIES
+app.get('/quality/getCountyMortalityResults1', routes.get_county_mortality_results1)
+app.get('/quality/getCountyMortalityResults2', routes.get_county_mortality_results2)
+app.get('/quality/getCountyMortalityResults3', routes.get_county_mortality_results3)
+
 
 app.listen(config.server_port, () => {
     console.log(`Server running at http://${config.server_host}:${config.server_port}/`);
