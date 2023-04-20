@@ -27,10 +27,6 @@ class HomePage extends React.Component {
   }
 
   componentDidMount() {
-    var map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11'
-    });
   }
 
  
@@ -51,7 +47,17 @@ class HomePage extends React.Component {
           <h3> Welcome to 'MedMap' Application! </h3>
           </Row>
           <Row>
-          <div id="map" style={{position: "absolute", top: "0", bottom: "0", width: "100%" }}></div>
+            <p>Visit the <strong>'Map'</strong> page for a visual representation of the United States, displaying rankings of the states'
+            overall rankings for healthcare quality, healthcare access, and public health.</p>
+          </Row>
+          <Row>
+            <p>Visit the <strong>'Quality'</strong> page to see county by county information related to healthcare quality.</p>
+          </Row>
+          <Row>
+            <p>Visit the <strong>'Access'</strong> page to see county by county information related to healthcare access.</p>
+          </Row>
+          <Row>
+            <p>Visit the <strong>'Compare'</strong> page to compare data about all of the above between two counties..</p>
           </Row>
         
         </Form>

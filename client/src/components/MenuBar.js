@@ -28,6 +28,16 @@ class MenuBar extends React.Component {
                 Quality
               </NavLink>
             </NavItem>
+            <NavItem>
+              <NavLink active  href="/access" >
+                Access
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink active  href="/compare" >
+                Compare
+              </NavLink>
+            </NavItem>
           </Nav>
       </Navbar>
         )

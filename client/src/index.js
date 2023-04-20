@@ -9,6 +9,8 @@ import {
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import QualityPage from './pages/QualityPage';
+import AccessPage from './pages/AccessPage';
+import ComparePage from './pages/CompagePage';
 import 'antd/dist/antd.css';
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -32,6 +34,16 @@ ReactDOM.render(
 							path="/quality"
 							render={() => (
 								<QualityPage />
+							)}/>
+		<Route exact
+							path="/access"
+							render={() => (
+								<AccessPage />
+							)}/>
+		<Route exact
+							path="/compare"
+							render={() => (
+								<ComparePage />
 							)}/>
       </Switch>
     </Router>

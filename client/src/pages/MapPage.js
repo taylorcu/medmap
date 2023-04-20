@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import USAMap from "react-usa-map";
-import { Form, FormInput, FormGroup, Button, } from "shards-react";
+import { Form, Button, FormGroup, CardTitle, Card, CardBody, CardSubtitle } from "shards-react";
 import {
   Table,
   Pagination,
   Select,
-  Row
+  Row,
+  Col
 } from 'antd'
 
 import MenuBar from '../components/MenuBar';
-import { getNewsRankings, getNameFromCode, getCountiesFromState, getCodeToNumericRanking, getAccessRankings, getQualityRankings, getPublicHealthRankings } from '../fetcher'
-const { Column, ColumnGroup } = Table;
+import { getNewsRankings, getNameFromCode, getCountiesFromState, getCodeToNumericRanking, getAccessRankings, 
+    getQualityRankings, getPublicHealthRankings, getRankingsList } from '../fetcher'
 const { Option } = Select;
+
 
 // COLUMNS FOR STATE DISPLAY
 const stateColumns = [
@@ -49,20 +51,21 @@ const stateColumns = [
 ];
 
 
-// COLUMNS FOR COUNTY DISPLAY
-const countyColumns = [
+// COLUMNS FOR RANKING DISPLAY
+const rankingColumns = [
     {
-        title: 'County Name',
-        dataIndex: 'name',
-        key: 'name',
-        sorter: (a, b) => a.name.localeCompare(b.name)
+        title: 'State',
+        dataIndex: 'Name',
+        key: 'Name',
+        sorter: (a, b) => a.Name.localeCompare(b.Name)
       },
       {
-        title: 'Numeric Code',
-        dataIndex: 'fips',
-        key: 'fips'
-      },
-];
+        title: 'Ranking',
+        dataIndex: 'Ranking',
+        key: 'Ranking',
+        sorter: (a, b) => a.Ranking - b.Ranking
+      }
+]
 
 class MapPage extends React.Component {
     // CLASS CONSTRUCTOR
@@ -75,12 +78,14 @@ class MapPage extends React.Component {
             stateResults: [],
             countyResults: [],
             stateCodeToNumericRanking: [], 
+            stateNameToNumericRanking: []
         }
 
         this.handleStateSelected = this.handleStateSelected.bind(this)
         this.setStateRankingMethod = this.setStateRankingMethod.bind(this)
         this.mapHandler = this.mapHandler.bind(this)
         this.statesCustomConfig = this.statesCustomConfig.bind(this)
+        this.doNothing = this.doNothing.bind(this)
     }
 
     // MAP HANDLER FROM API 
@@ -102,27 +107,33 @@ class MapPage extends React.Component {
 
             // if looking at overall rankings 
             if (this.state.stateRankingMethod == "Overall") {
-                console.log('setting overall rankings')
                 // sort by 
                 if (stateRanking <= 30) {
-                    color = "green"
-                } else if (stateRanking <= 110) {
-                    color = "yellow"
+                    color = "#b9d2f0"
+                } else if (stateRanking <= 60) {
+                    color = "#7fb7fa"
+                } else if (stateRanking <= 90) {
+                    color = "#559cf2"
+                } else if (stateRanking <= 120) {
+                    color = "#1762bd"
                 } else {
-                    color = "red"
+                    color = "#033f87"
                 }
             }
 
             // if looking at other rankings 
             else {
-                console.log('setting other rankings')
                 // sort by 
-                if (stateRanking <= 15) {
-                    color = "green"
-                } else if (stateRanking <= 35) {
-                    color = "yellow"
+                if (stateRanking <= 10) {
+                    color = "#b9d2f0"
+                } else if (stateRanking <= 20) {
+                    color = "#7fb7fa"
+                } else if (stateRanking <= 30) {
+                    color = "#559cf2"
+                } else if (stateRanking <= 40) {
+                    color = "#1762bd"
                 } else {
-                    color = "red"
+                    color = "#033f87"
                 }
             }
             
@@ -177,6 +188,11 @@ class MapPage extends React.Component {
                 this.setState({ stateCodeToNumericRanking: res.results })
             });
         }
+
+        // call function to get full list
+        getRankingsList(value).then(res => {
+            this.setState({ stateNameToNumericRanking: res.results })
+        });
     }  
 
     componentDidMount() {
@@ -184,7 +200,21 @@ class MapPage extends React.Component {
          getCodeToNumericRanking().then(res => {
             this.setState({ stateCodeToNumericRanking: res.results })
         }); 
+
+         // call function to get full list
+         getRankingsList("Overall").then(res => {
+            this.setState({ stateNameToNumericRanking: res.results })
+        });
+
+
     } 
+
+    // DO NOTHING -- legend button workaround 
+    doNothing() {
+    
+    }
+
+    
 
   render() {
 
@@ -193,33 +223,68 @@ class MapPage extends React.Component {
         <MenuBar />
         <Form style={{ width: '80vw', margin: '0 auto', marginTop: '5vh' }}>
             <Row>
-                <h3> Welcome to MedMap main interface!</h3>
-                <p> This ranking system is based on a 1st to 50th ranking by state in three categories: healthcare access, healthcare quality,
-                    and public health. For ranking selection in each of these categories, a 'green' state is ranked between 1st and 15th, a 'yellow' state 
-                    is ranked between 16th and 35th, and a 'red' state is ranked between 36th and 50th.  For the overall ranking selection, a 'green' state has a composite score (added) of 3 to 30, a 'yellow' 
-                    state has a score of 31 to 110, and a 'red' state has a score of 111 to 150. 
+                <h3> Welcome to the Map Page</h3>
+                <p> Displayed below is the US map, color-coded with a ranking system. This ranking system is based on a 1st to 50th ranking by state in three categories: healthcare access, healthcare quality,
+                    and public health. Click on a state to see more information about its ratings below. Scroll to view a table of all rankings by selected category. This data is compiled by US News, as of 2022. 
                 </p>
             </Row>
             <Row>
+                <Col span={14}><FormGroup style={{ width: '40vw', margin: '0 auto' }}>
+                    <Card><CardSubtitle>Select Ranking Method</CardSubtitle><CardBody>
             <Select defaultValue="Overall" style={{ width: 170 }} onChange={this.setStateRankingMethod}>
                                 <Option value="Overall">Overall</Option>
                                 <Option value="HealthCareAccess">Healthcare Access</Option>
                                 <Option value="HealthCareQuality">Healthcare Quality</Option>
                                 <Option value="PublicHealth">Public Health</Option>
-                            </Select> 
+                            </Select></CardBody></Card></FormGroup>
+            
+            </Col>
+
+            <Col span={10}>
+            {this.state.stateRankingMethod !== "Overall" && <Card style={{marginTop: '2vh'}}>
+                <CardSubtitle>Map Legend (State Ranking)</CardSubtitle>
+                <CardBody>
+                    <p style={{color:"#b9d2f0"}}> 1st to 10th</p>
+                    <p style={{color:"#7fb7fa"}}> 11th to 20th</p>
+                    <p style={{color:"#559cf2"}}> 21st to 30th</p>
+                    <p style={{color:"#1762bd"}}> 31st to 40th</p>
+                    <p style={{color:"#033f87"}}> 41st to 50th</p>
+                </CardBody>
+                
+            </Card>}
+            {this.state.stateRankingMethod === "Overall" && <Card>
+                <CardSubtitle>Map Legend (Aggregate Score)</CardSubtitle>
+                <CardBody>
+                    <p style={{color:"#b9d2f0"}}> 1 to 30</p>
+                    <p style={{color:"#7fb7fa"}}> 31 to 60</p>
+                    <p style={{color:"#559cf2"}}> 61 to 90</p>
+                    <p style={{color:"#1762bd"}}> 91 to 120</p>
+                    <p style={{color:"#033f87"}}> 121 to 150</p>
+                </CardBody>
+                
+            </Card>}</Col>
             </Row>
-          <Row> 
+
+            <Card style={{marginTop: '2vh'}}>
+            <Row> 
             <USAMap customize={this.statesCustomConfig()} onClick={this.mapHandler} />
-          </Row>
-          <Row>
-            <label><strong>Selected State: {this.state.selectedState} </strong></label>
-        </Row><Row>
-            <Table dataSource={this.state.stateResults} columns={stateColumns} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}/>
-          </Row>
-          <Row>
-          <Table dataSource={this.state.countyResults} columns={countyColumns} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}/>
-          </Row>
-        
+            </Row>
+            </Card>
+
+            
+
+            {(this.state.stateResults.length !== 0) && <Card style={{marginTop: '2vh'}}><CardBody><div>
+                <Row>
+                    <label><strong>Selected State: {this.state.selectedState} </strong></label>
+                </Row>
+                <Row>
+                    <Table dataSource={this.state.stateResults} columns={stateColumns} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}/>
+                </Row></div></CardBody></Card>}
+
+            <Card style={{marginTop: '2vh'}}>
+                <CardTitle>State Rankings by {this.state.stateRankingMethod}</CardTitle>
+                <CardBody><Table dataSource={this.state.stateNameToNumericRanking} columns={rankingColumns} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5, showQuickJumper:true }}/>
+            </CardBody></Card>
         </Form>
         </div>
       );
